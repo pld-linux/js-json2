@@ -1,7 +1,7 @@
 Summary:	JSON in JavaScript
 Name:		js-json2
 Version:	20100320
-Release:	2
+Release:	1
 License:	Public Domain
 Group:		Applications/WWW
 Source0:	http://www.JSON.org/json2.js
@@ -12,7 +12,6 @@ BuildRequires:	jsmin
 Requires:	webapps
 Requires:	webserver(access)
 Requires:	webserver(alias)
-Conflicts:	apache-base < 2.4.0-1
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -34,19 +33,11 @@ if [ "$(echo "$version" | tr -d -)" != %{version} ]; then
 	exit 1
 fi
 
-# apache1 conf
+# apache1/apache2 conf
 cat > apache.conf <<'EOF'
 Alias /js/json2.js %{_appdir}/json2.js
 <Directory %{_appdir}>
 	Allow from all
-</Directory>
-EOF
-
-# apache2 conf
-cat > httpd.conf <<'EOF'
-Alias /js/json2.js %{_appdir}/json2.js
-<Directory %{_appdir}>
-	Require all granted
 </Directory>
 EOF
 
@@ -68,7 +59,7 @@ cp -a json2-min.js $RPM_BUILD_ROOT%{_appdir}/json2.js
 
 install -d $RPM_BUILD_ROOT%{_sysconfdir}
 cp -a apache.conf $RPM_BUILD_ROOT%{_sysconfdir}/apache.conf
-cp -a httpd.conf $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
+cp -a apache.conf $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
 cp -a lighttpd.conf $RPM_BUILD_ROOT%{_sysconfdir}/lighttpd.conf
 
 %clean
@@ -80,10 +71,10 @@ rm -rf $RPM_BUILD_ROOT
 %triggerun -- apache1 < 1.3.37-3, apache1-base
 %webapp_unregister apache %{_webapp}
 
-%triggerin -- apache-base
+%triggerin -- apache < 2.2.0, apache-base
 %webapp_register httpd %{_webapp}
 
-%triggerun -- apache-base
+%triggerun -- apache < 2.2.0, apache-base
 %webapp_unregister httpd %{_webapp}
 
 %triggerin -- lighttpd
