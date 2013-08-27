@@ -1,7 +1,7 @@
 Summary:	JSON in JavaScript
 Name:		js-json2
 Version:	20100320
-Release:	1
+Release:	3
 License:	Public Domain
 Group:		Applications/WWW
 Source0:	http://www.JSON.org/json2.js
@@ -37,7 +37,15 @@ fi
 cat > apache.conf <<'EOF'
 Alias /js/json2.js %{_appdir}/json2.js
 <Directory %{_appdir}>
-	Allow from all
+	# Apache 2.x
+	<IfModule !mod_authz_core.c>
+		Order allow,deny
+		Allow from all
+	</IfModule>
+	# Apache 2.4
+	<IfModule mod_authz_core.c>
+		Require all granted
+	</IfModule>
 </Directory>
 EOF
 
